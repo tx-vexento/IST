@@ -133,7 +133,7 @@ class IST:
         if not isinstance(styles, list):
             styles = [styles]
         for style in styles:
-            # if self.get_style(code, style)[style] > 0: return code, 1
+            if self.get_style(code, style)[style] > 0: return code, 1
             if style in self.exclude[self.language]: continue
             if style in self.need_bracket: code, _ = self.transfer(['1.2'], code)
             if style.split('.')[0] == '10': code, _ = self.transfer(['11.1'], code)
