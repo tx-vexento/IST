@@ -1,4 +1,5 @@
 from ist_utils import text, print_children
+from collections import defaultdict
 from transform.lang import get_lang
 
 declaration_map = {'c': 'declaration', 'java': 'local_variable_declaration', 'c_sharp': 'local_declaration_statement'}
@@ -165,12 +166,16 @@ def count_for(root):
     return len(nodes)
 
 def convert_while(node, code):
+    node_info = defaultdict(type(node))
     # a while(b) c
     if node.type == 'for_statement':
         res, add_bracket = [], None
         abc = get_for_info(node)
-        child_index = 3 + (4 - abc.count(None)) - (abc[0] is not None and abc[0].type == 'declaration')
-        res = [(node.children[child_index].end_byte, node.children[0].start_byte - node.children[child_index].end_byte)]    # 删除for(a;b;c)
+        for c in node.children:
+            if c.type == 'block':
+                node_info['block'] = c
+                break
+        res = [(node_info['block'].start_byte - 1, node.start_byte)]    # 删除for(a;b;c)
         if abc[0] is not None:  # 如果有a
             indent = get_indent(node.start_byte, code)
             if abc[0].type != declaration_map[get_lang()]:
@@ -200,13 +205,17 @@ def count_while(root):
     return len(nodes)
 
 def convert_do_while(node, code):
+    node_info = defaultdict(type(node))
     if node.type == 'for_statement':
         # a while(b) c
         res, add_bracket = [], None
         abc = get_for_info(node)
         if abc is None: return
-        child_index = 3 + (4 - abc.count(None)) - (abc[0] is not None and abc[0].type == declaration_map[get_lang()])
-        res = [(node.children[child_index].end_byte, node.children[0].start_byte - node.children[child_index].end_byte)]    # 删除for(a;b;c)
+        for c in node.children:
+            if c.type == 'block':
+                node_info['block'] = c
+                break
+        res = [(node_info['block'].start_byte - 1, node.start_byte)]    # 删除for(a;b;c)
         if abc[0] is not None:  # 如果有a
             indent = get_indent(node.start_byte, code)
             if abc[0].type != declaration_map[get_lang()]:

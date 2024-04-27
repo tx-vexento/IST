@@ -1,4 +1,4 @@
-from ist_utils import replace_from_blob, traverse_rec_func, text, print_children
+from ist_utils import replace_from_blob, traverse_rec_func, text, print_children, get_indent
 from transform.lang import get_lang
 
 def get_declare_info(node):
@@ -45,17 +45,6 @@ def get_id_first_line(node):
                 if each not in first_use.keys():
                     first_use[each] = child.start_point[0]
     return first_declare, first_use
-
-def get_indent(start_byte, code):
-    indent = 0
-    i = start_byte
-    while i >= 0 and code[i] != '\n':
-        if code[i] == ' ':
-            indent += 1
-        elif code[i] == '\t':
-            indent += 4
-        i -= 1
-    return indent
 
 '''==========================匹配========================'''
 

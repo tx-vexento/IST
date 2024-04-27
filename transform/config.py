@@ -1,6 +1,7 @@
 from .transform_tokensub import *
 from .transform_invichar import *
 from .transform_deadcode import *
+from .transform_clean import *
 from .transform_identifier_name import *
 from .transform_bracket import *
 from .transform_augmented_assignment import *
@@ -53,9 +54,10 @@ transformation_operators = {
         'deadcode2': (match_function, 
                      convert_deadcode2,
                      count_deadcode),
-        'deadcode_cs': (match_function, 
-                     convert_deadcode_cs,
-                     count_deadcode)
+    },
+
+    'clean':{
+        'clean': (match_nothing, convert_nothing, count_nothing)
     },
 
     'identifier_name': {
@@ -196,13 +198,14 @@ transformation_operators = {
     },
 
     'for_format': {
+        'abc':      (match_for,     convert_abc, count_abc),
         'obc':      (match_for,     convert_obc, count_obc),
-        'aoc':      (match_for,     convert_aoc, count_obc),
-        'abo':      (match_for,     convert_abo, count_obc),
-        'aoo':      (match_for,     convert_aoo, count_obc),
-        'obo':      (match_for,     convert_obo, count_obc),
-        'ooc':      (match_for,     convert_ooc, count_obc),
-        'ooo':      (match_for,     convert_ooo, count_obc),
+        'aoc':      (match_for,     convert_aoc, count_aoc),
+        'abo':      (match_for,     convert_abo, count_abo),
+        'aoo':      (match_for,     convert_aoo, count_aoo),
+        'obo':      (match_for,     convert_obo, count_obo),
+        'ooc':      (match_for,     convert_ooc, count_ooc),
+        'ooo':      (match_for,     convert_ooo, count_ooo),
     },
 
     'for_while': {

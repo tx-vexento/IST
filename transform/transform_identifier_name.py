@@ -5,6 +5,7 @@ import inflection
 from transformers import BertTokenizer
 from ist_utils import text, parent, cpp_keywords
 from transform.lang import get_lang
+import random
 
 tokenizer = None
 
@@ -33,7 +34,6 @@ def match_identifier(root):
         def check(u):
             if u.type not in ['identifier']: return False
             # if u.id in for_statement_identifiers_ids: return False
-            if u.parent.type in ['scoped_identifier']: return False
             return True
     elif get_lang() == 'c_sharp':
         def check(u):
@@ -148,6 +148,7 @@ def count_camel(root):
     nodes = match_identifier(root)
     res = 0
     for node in nodes:
+        # print(text(node), node.parent.type)
         res += is_camel(text(node)) and not count_hungarian(node)
     return res
 
@@ -178,7 +179,7 @@ def count_pascal(root):
     nodes = match_identifier(root)
     res = 0
     for node in nodes:
-        res += is_pascal(text(node))
+        res += is_pascal(text(node)) and node.parent.type not in ['scoped_identifier', 'method_declaration', 'field_access', 'method_invocation']
     return res
 
 def convert_snake(node):       # aaa_bbb
@@ -229,6 +230,8 @@ def convert_hungarian(node):     # intAabb
     _type = []
     find_type(root)
     if len(_type) == 0: return
+    _type[0] = _type[0].split('<', 1)[0]
+    _type[0] = _type[0].split('[', 1)[0]
     new_id = _type[0] + text(node)[0].upper() + text(node)[1:]
     return [(node.end_byte, node.start_byte), (node.start_byte, new_id)]
 
@@ -257,6 +260,8 @@ def count_hungarian(root):
         _type = []
         find_type(node)
         if len(_type) == 0: continue
+        _type[0] = _type[0].split('<', 1)[0]
+        # print(text(node), _type)
         res += _type[0] == text(node)[:len(_type[0])]
     return res
 

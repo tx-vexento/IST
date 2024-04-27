@@ -63,6 +63,7 @@ def cvt_split(node):
         if_expr_list.append(f'if({expr})')
     if len(if_expr_list) < 2:
         if_expr_list.append("if(1)")
+        return
     new_str = ' '.join(if_expr_list)
     
     if get_lang() == 'c_sharp':

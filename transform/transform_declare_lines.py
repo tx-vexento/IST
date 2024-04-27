@@ -24,12 +24,15 @@ def contain_id(node, contain):
     if node.child_by_field_name('index'):   # a[i] < 2中的index：i
         contain.add(text(node.child_by_field_name('index')))
     lang = get_lang()
-    types_map = {'c': ['init_declarator'], 
+    _map = {'c': ['init_declarator', 'declaration'], 
                  'java': ['variable_declarator']}
+    # if node.type == 'identifier' and \
+    #     node.parent.type in _map[lang] and \
+    #     len(node.parent.children) >= 3 and \
+    #     node.parent.children[0] == node:
+    #     contain.add(text(node))
     if node.type == 'identifier' and \
-        node.parent.type in types_map[lang] and \
-        len(node.parent.children) >= 3 and \
-        node.parent.children[0] == node:
+        node.parent.type in _map[lang]:
         contain.add(text(node))
     if not node.children:
         return

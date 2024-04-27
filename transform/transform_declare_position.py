@@ -55,12 +55,15 @@ def get_id_first_line(node):
 def get_indent(start_byte, code):
     indent = 0
     i = start_byte
-    while i >= 0 and code[i] != '\n':
-        if code[i] == ' ':
-            indent += 1
-        elif code[i] == '\t':
-            indent += 4
-        i -= 1
+    try:
+        while i >= 0 and code[i] != '\n':
+            if code[i] == ' ':
+                indent += 1
+            elif code[i] == '\t':
+                indent += 4
+            i -= 1
+    except:
+        pass
     return indent
 
 '''==========================匹配========================'''

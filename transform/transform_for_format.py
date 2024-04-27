@@ -61,6 +61,17 @@ def match_for(root):
     return res
 
 '''==========================替换========================'''
+def convert_abc(node, code):
+    return
+
+def count_abc(node):
+    nodes = match_for(node)
+    res = 0
+    for _node in nodes:
+        abc = get_for_info(_node)
+        res += abc[0] is not None and abc[1] is not None and abc[2] is not None
+    return res
+
 def convert_obc(node, code):
     # a for(;b;c)
     abc = get_for_info(node)
@@ -74,7 +85,12 @@ def convert_obc(node, code):
                     (node.start_byte, text(abc[0]) + f'\n{indent * " "}')]
 
 def count_obc(node):
-    return 0
+    nodes = match_for(node)
+    res = 0
+    for _node in nodes:
+        abc = get_for_info(_node)
+        res += abc[0] is None and abc[1] is not None and abc[2] is not None
+    return res
 
 def convert_aoc(node, code):
     # for(a;;c) if b break
@@ -93,7 +109,15 @@ def convert_aoc(node, code):
         if add_bracket:
             res.extend(add_bracket)
         return res
-                
+
+def count_aoc(node):
+    nodes = match_for(node)
+    res = 0
+    for _node in nodes:
+        abc = get_for_info(_node)
+        res += abc[0] is not None and abc[1] is None and abc[2] is not None
+    return res
+             
 def convert_abo(node, code):
     # for(a;b;) c
     res, add_bracket = [], None
@@ -111,6 +135,14 @@ def convert_abo(node, code):
         if add_bracket:
             res.extend(add_bracket)
         return res
+
+def count_abo(node):
+    nodes = match_for(node)
+    res = 0
+    for _node in nodes:
+        abc = get_for_info(_node)
+        res += abc[0] is not None and abc[1] is not None and abc[2] is None
+    return res
 
 def convert_aoo(node, code):
     # for(a;;) if b break c
@@ -136,6 +168,14 @@ def convert_aoo(node, code):
         res.append((last_expression_node.end_byte, f"\n{indent * ' '}{text(abc[2])};"))
     if add_bracket:
         res.extend(add_bracket)
+    return res
+
+def count_aoo(node):
+    nodes = match_for(node)
+    res = 0
+    for _node in nodes:
+        abc = get_for_info(_node)
+        res += abc[0] is not None and abc[1] is None and abc[2] is None
     return res
 
 def convert_obo(node, code):
@@ -164,6 +204,14 @@ def convert_obo(node, code):
         res.extend(add_bracket)
     return res
 
+def count_obo(node):
+    nodes = match_for(node)
+    res = 0
+    for _node in nodes:
+        abc = get_for_info(_node)
+        res += abc[0] is None and abc[1] is not None and abc[2] is None
+    return res
+
 def convert_ooc(node, code):
     # a for(;;c) if b break
     res, add_bracket = [], None
@@ -188,6 +236,14 @@ def convert_ooc(node, code):
         res.append((first_expression_node.start_byte, f"if ({text(abc[1])})\n{(indent + 4) * ' '}break;\n{indent * ' '}"))
     if add_bracket:
         res.extend(add_bracket)
+    return res
+
+def count_ooc(node):
+    nodes = match_for(node)
+    res = 0
+    for _node in nodes:
+        abc = get_for_info(_node)
+        res += abc[0] is None and abc[1] is None and abc[2] is not None
     return res
 
 def convert_ooo(node, code):
@@ -223,4 +279,12 @@ def convert_ooo(node, code):
         res.append((last_expression_node.end_byte, f"\n{indent * ' '}{text(abc[2])};"))
     if add_bracket:
         res.extend(add_bracket)
+    return res
+
+def count_ooo(node):
+    nodes = match_for(node)
+    res = 0
+    for _node in nodes:
+        abc = get_for_info(_node)
+        res += abc[0] is None and abc[1] is None and abc[2] is None
     return res

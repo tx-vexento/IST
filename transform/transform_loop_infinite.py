@@ -11,7 +11,7 @@ def get_for_info(node):
         if child.type in [';', ')', declaration_map[get_lang()]]:
             if child.type == declaration_map[get_lang()]:
                 abc[i] = child
-            if child.prev_sibling.type not in ['(', ';']:
+            if child.prev_sibling and child.prev_sibling.type not in ['(', ';']:
                 abc[i] = child.prev_sibling
             i += 1
         if child.prev_sibling and child.prev_sibling.type == ')' and i == 3:

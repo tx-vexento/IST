@@ -19,7 +19,7 @@ def match_function(root):
 
 def convert_deadcode1(node, code):
     block_node = None
-    block_mapping = {'c': 'compound_statement', 'java': 'block'}
+    block_mapping = {'c': 'compound_statement', 'java': 'block', 'c_sharp': 'block'}
     for u in node.children:
         if u.type == block_mapping[get_lang()]:
             block_node = u
@@ -36,8 +36,9 @@ def convert_deadcode1(node, code):
 
 def convert_deadcode2(node, code):
     block_node = None
+    block_mapping = {'c': 'compound_statement', 'java': 'block', 'c_sharp': 'block'}
     for u in node.children:
-        if u.type == 'block':
+        if u.type == block_mapping[get_lang()]:
             block_node = u
             break
     if block_node is None: return
@@ -45,6 +46,8 @@ def convert_deadcode2(node, code):
         deadcode = 'System.out.println(233);'
     elif get_lang() == 'c_sharp':
         deadcode = 'Console.WriteLine(233);'
+    elif get_lang() == 'c':
+        deadcode = 'printf("233\n");'
     indent = get_indent(block_node.children[1].start_byte, code)
     return [(block_node.children[0].end_byte, f"\n{' '*indent}{deadcode}")]
 

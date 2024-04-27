@@ -1,15 +1,20 @@
 from ist_utils import text, print_children
-from transform.lang import get_lang
+from transform.lang import get_lang, get_expand
 
 def get_indent(start_byte, code):
     indent = 0
     i = start_byte
-    while i >= 0 and code[i] != '\n':
-        if code[i] == ' ':
-            indent += 1
-        elif code[i] == '\t':
-            indent += 4
-        i -= 1
+    try:
+        while len(code) > 0 and len(code) < i and i >= 0 and code[i] != '\n':
+            if code[i] == ' ':
+                indent += 1
+            elif code[i] == '\t':
+                indent += 4
+            i -= 1
+    except:
+        print(f"code = {code}")
+        print(f"i = {i}")
+        pass
     return indent
     
 def match_ifforwhile_has_bracket(root):
@@ -17,7 +22,7 @@ def match_ifforwhile_has_bracket(root):
     block_mp = {'c': 'compound_statement', 'java': 'block'}
     def check(u):
         if u.type in ['while_statement', 'if_statement', 'for_statement', 'else_clause'] and \
-            '{' in text(u):
+            '{' in text(u) and '}' in text(u):
             count = -1
             for v in u.children:
                 if v.type == block_mp[lang]:
@@ -39,11 +44,19 @@ def match_ifforwhile_has_bracket(root):
 def match_ifforwhile_hasnt_bracket(root):
     res = []
     def match(u):
-        if u.type in ['while_statement', 'if_statement', 'for_statement', 'else_clause'] and \
-            '{' not in text(u):
-            res.append(u)
-        for v in u.children:
-            match(v)
+        if not get_expand():
+            if u.type in ['while_statement', 'if_statement', 'for_statement', 'else_clause'] and '{' not in text(u) and '}' not in text(u):
+                # print(text(u))
+                res.append(u)
+
+        elif get_expand():                                       
+            if u.type in ['while_statement', 'if_statement', 'for_statement', 'else_clause', 'return_statement', 'expression_statement', 'throw_statement'] and text(u)[0] != '{':
+                # 只有一个 'expression_statement'
+                if u.type == 'expression_statement':
+                    if 'expression_statement' in [t.type for t in res]:
+                        return
+                res.append(u)
+        for v in u.children: match(v)
     match(root)
     return res
 
@@ -73,6 +86,9 @@ def convert_del_ifforwhile_bracket(node, code):
             (statement_node.start_byte, new_contents)]
 
 def convert_add_ifforwhile_bracket(node, code):
+    if node.type in ['return_statement', 'expression_statement', 'throw_statement']:
+        return [(node.end_byte, node.start_byte),
+                (node.start_byte, f"{{{text(node)}}}")]
     # 在单行If、For、While添加大括号
     statement_node = None
     for each in node.children:
@@ -92,6 +108,21 @@ def convert_add_ifforwhile_bracket(node, code):
                 (statement_node.end_byte, f"\n{indent * ' '}}}")]
 
 def count_has_ifforwhile_bracket(root):
+    if get_expand():
+        lang = get_lang()
+        block_mp = {'c': 'compound_statement', 'java': 'block'}
+        def check(u):
+            if u.type == block_mp[lang] and u.parent.type != 'method_declaration':
+                return True
+            return False
+        res = []
+        def match(u):
+            if check(u): res.append(u)
+            for v in u.children:
+                match(v)
+        match(root)
+        return len(res)
+    
     nodes = match_ifforwhile_has_bracket(root)
     return len(nodes)
 
